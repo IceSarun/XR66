@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>A-Frame AR.js</title>
+    <meta charset="utf-8" />
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    
+    <script>
+      // this is an object, not an array
+      let marker_visible = { m0: false, m1: false, m2: false, m3: false, m4: false, m5: false };
+
+      // a component to handle marker events: found and lost
+      AFRAME.registerComponent("marker-events", {
+        init: function () {
+          let el = this.el; // element = component
+
+          el.addEventListener("markerFound", function () {
+            marker_visible[el.id] = true;
+            // console.log(el.id + " found");
+          });
+
+          el.addEventListener("markerLost", function () {
+            marker_visible[el.id] = false;
+            // console.log(el.id + " lost");
+          });
+        },
+      });
+
+      AFRAME.registerComponent("draw-cube", {
+        init: function () {
+          // getting the DOM(a-entity) elements
+          this.p3 = document.querySelector("#p3");
+          this.p4 = document.querySelector("#p4");
+          this.p5 = document.querySelector("#p5");
+          
+          this.o3 = new object3D();
+          this.p3.object3D.add(this.o3);
+          
+          o3.applyMatrix(new THREE.Matrix4(),makeTranslation(0, -1, 0));
+          
+
+          // a buffer (data) representing a line (a long and thin cylinder)
+          let geometry = new THREE.BoxGrometry(1, 1, 1, 1);
+          // geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0.5, 0));
+          // geometry.applyMatrix(
+          //   new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(90))
+          //   );
+          
+          let yellow = new THREE.MeshLambertMaterial({ color: 0xffff00});
+          let cyan = new THREE.MeshLambertMaterial({ color: 0x00ffff});
+          let magenta = new THREE.MeshLambertMaterial({ color: 0xff00ff});
+          yellow.opacity = 0.5;
+          cyan.opacity = 0.5;
+          magenta.opacity = 0.5;
+
+          // set up the material of the line
+          // let white = new THREE.MeshLambertMaterial({ color: 0xffffff });
+          // white.opacity = 0.5;
+
+          // assemble a line by combining the buffer and material
+          // this.line = new THREE.Mesh(geometry, white);
+          this.yellowBox = new THREE.Mesh(geometry, yellow);
+          
+          this.where = document.querySelector("#draw-cube");
+          this.where.object3D.add(yellowBox);
+          this.yellow.visible = true;
+          
+          this.cyanBox = new THREE.Mesh(geometry, cyan);
+          this.magentaBox = new THREE.Mesh(geometry, magenta);
+          
+          this.p3.object3D.add(this.yellowBox);
+          // this.p4.object3D.add(this.cyanBox);
+          // this.p5.object3D.add(this.magentaBox);
+
+          // get the current object3D from the #drawHere inside #m0
+          // this.left = document.querySelector("#drawLeft").object3D;
+
+          // add the line to the origin object3D (located at #drawHere which is #m0)
+          // this.left.add(this.line);
+        },
+
+        // loop to check if the two markers are visible
+        tick: function (time, deltaTime) {
+          // if both markers are visible, get their world positions and store in p0 and p1
+          if (marker_visible["m3"]) {
+              this.yellowBox.visible = true;
+              this.yellow.parent = this.o3;
+          } else { this.yellowBox.visible = false; }
+          
+//           if (marker_visible["m4"]) {
+//               this.cyanBox.visible = true;
+//           } else { this.cyanBox.visible = false; }
+          
+//           if (marker_visible["m5"]) {
+//               this.magentaBox.visible = true;
+//           } else { this.magentaBox.visible = false; }
+        },
+      });
+    </script>
+  </head>
+  <body style="margin: 0px; overflow: hidden">
+    <!-- A-Frame is built on top of Three.js. All a-frame elements are Three's object3D,
+         but A-Frame does not include AR.js components by default. 
+         We also want to hide the VR UI. -->
+    <a-scene
+      embedded
+      arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      vr-mode-ui="enabled: false;"
+    >
+      <!-- marker #m0 or p0 -->
+      <a-marker type="barcode" value="0" id="m0" marker-events>
+        <!-- draw a red box -->
+        <a-entity position="0 -1.5 0" id="p0">
+        <a-box
+          position="0 0 0" scale="1.5 1.5 1.5" color="red" opacity="0.5"
+        ></a-box>
+        </a-entity>
+      </a-marker>
+      
+      <!-- marker #m1 or p1 -->
+      <a-marker type="barcode" value="1" id="m1" marker-events>
+        <!-- draw a red box -->
+        <a-entity position="0 -1 0" id="p1">
+        <a-box
+          position="0 0 0" scale="1.5 1.5 1.5" color="green" opacity="0.5"
+        ></a-box>
+        </a-entity>
+      </a-marker>
+      
+      <!-- marker #m2 or p2 -->
+      <a-marker type="barcode" value="2" id="m2" marker-events>
+        <!-- draw a red box -->
+        <a-entity position="0 -1 0" id="p2">
+        <a-box
+          position="0 0 0" scale="1.5 1.5 1.5" color="blue" opacity="0.5"
+        ></a-box>
+        </a-entity>
+      </a-marker>
+      
+      <!-- marker #m3 or p3 -->
+      <a-marker type="barcode" value="3" id="m3" marker-events>
+        <!-- draw a red box -->
+        <a-entity position="0 -1 0" id="p3">
+<!--         <a-box
+          position="0 0 0" scale="1.5 1.5 1.5" color="yellow" opacity="0.5"
+        ></a-box> -->
+        </a-entity>
+      </a-marker>
+      
+      <!-- marker #m4 or p4 -->
+      <a-marker type="barcode" value="4" id="m4" marker-events>
+        <!-- draw a red box -->
+        <a-entity position="0 -1 0" id="p4">
+<!--         <a-box
+          position="0 0 0" scale="1.5 1.5 1.5" color="purple" opacity="0.5"
+        ></a-box> -->
+        </a-entity>
+      </a-marker>
+      
+      <!-- marker #m5 or p5 -->
+      <a-marker type="barcode" value="5" id="m5" marker-events>
+        <!-- draw a red box -->
+        <a-entity position="0 -1 0" id="p5">
+<!--         <a-box
+          position="0 0 0" scale="1.5 1.5 1.5" color="orange" opacity="0.5"
+        ></a-box> -->
+        </a-entity>
+      </a-marker>
+
+      <!-- we need the camera entity to use the webcam to detect the markers -->
+      <a-entity camera> </a-entity>
+
+      <!-- This entity will check if the two markers are visible.
+           If the two markers are visible, the draw-line component will draw a blue line between the two markers -->
+      <a-entity draw-cube></a-entity>
+    </a-scene>
+  </body>
+</html>
