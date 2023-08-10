@@ -1,0 +1,292 @@
+<!--
+  
+  XR Homework 1
+  Name-Lastname: Sarunpawat Phosoi
+  StudentID: 6410406878
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>A-Frame AR.js</title>
+    <meta charset="utf-8" />
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+    <script>
+      // this is an object, not an array
+      let marker_visible = {
+        m0: false,
+        m1: false,
+        m2: false,
+        m3: false,
+        m4: false,
+        m5: false,
+      };
+
+      AFRAME.registerComponent("marker-events", {
+        init: function () {
+          let el = this.el; // element = component
+          el.addEventListener("markerFound", function () {
+            marker_visible[el.id] = true;
+            console.log(el.id + " found");
+          });
+          el.addEventListener("markerLost", function () {
+            marker_visible[el.id] = false;
+            console.log(el.id + " lost");
+          });
+        },
+      });
+
+      AFRAME.registerComponent("look-at-target", {
+        tick: function () {
+          const thisObject = this.el.object3D;
+          const targetObject = document.querySelector("#target").object3D;
+          const vec = new THREE.Vector3();
+          targetObject.getWorldDirection(vec);
+          vec.y = 0;
+          vec.add(thisObject.position);
+          thisObject.lookAt(vec);
+        },
+      });
+
+      AFRAME.registerComponent("draw-scene", {
+        init: function () {
+          this.testModel = document.querySelector("#test").object3D;
+          // this.testModel = new THREE.TorusKnotGeometry(0.5,0.1,80,16);
+          this.sceneRoot = new THREE.Object3D();
+          this.sceneRoot.add(this.testModel);
+          // draw the scene over #here and hide it
+          this.where = document.querySelector("#here").object3D;
+          this.where.add(this.sceneRoot);
+          this.sceneRoot.visible = false;
+          /* set the correct parent at each marker */
+          // parent p1
+          this.p1 = document.querySelector("#p1").object3D;
+          this.p1.applyMatrix(
+            // translate
+            new THREE.Matrix4().makeTranslation(0, -1, 0));
+          this.p1.applyMatrix(
+            // rotate
+            new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(0)));
+          //parent 0 2 3
+          this.p0 = document.querySelector("#p0").object3D;
+          this.p0.applyMatrix(
+            // translate
+            new THREE.Matrix4().makeTranslation(0, -1, 0)
+          );
+          this.p0.applyMatrix(
+            // rotate
+            new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(0)));
+          this.p2 = document.querySelector("#p2").object3D;
+          this.p2.applyMatrix(
+            // translate
+            new THREE.Matrix4().makeTranslation(0, -1, 0));
+          this.p2.applyMatrix(
+            // rotate
+            new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(0)));
+          this.p3 = document.querySelector("#p3").object3D;
+          this.p3.applyMatrix(
+            // translate
+            new THREE.Matrix4().makeTranslation(0, -1, 0));
+          this.p3.applyMatrix(
+            // rotate
+            new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(0)));
+          // parent p4
+          this.p4 = document.querySelector("#p4").object3D;
+          this.p4.applyMatrix(
+            // translate
+            new THREE.Matrix4().makeTranslation(0, -1, 0));
+          this.p4.applyMatrix(
+            // rotate
+            new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(0)));
+          // parent p5
+          this.p5 = document.querySelector("#p5").object3D;
+          this.p5.applyMatrix(
+            // translate
+            new THREE.Matrix4().makeTranslation(0, -1, 0));
+          this.p5.applyMatrix(
+            // rotate
+            new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(0)));
+        },
+
+        // loop to check if the two markers are visible
+        tick: function (time, deltaTime) {
+          if (marker_visible["m0"]) {
+          this.sceneRoot.parent = this.p0;
+          this.sceneRoot.visible = true;
+        } else if (marker_visible["m1"]) {
+          this.sceneRoot.parent = this.p1;
+          this.sceneRoot.visible = true;
+        } else if (marker_visible["m2"]) {
+          this.sceneRoot.parent = this.p2;
+          this.sceneRoot.visible = true;
+        } else if (marker_visible["m3"]) {
+          this.sceneRoot.parent = this.p3;
+          this.sceneRoot.visible = true;
+        } else if (marker_visible["m4"]) {
+          this.sceneRoot.parent = this.p4;
+          this.sceneRoot.visible = true;
+        } else if (marker_visible["m5"]) {
+          this.sceneRoot.parent = this.p5;
+          this.sceneRoot.visible = true;
+        } else {
+          this.sceneRoot.visible = false;
+        }
+
+        },
+      });
+    </script>
+  </head>
+  <body style="margin: 0px; overflow: hidden">
+    <!-- A-Frame is built on top of Three.js. All a-frame elements are Three's object3D,
+         but A-Frame does not include AR.js components by default. 
+         We also want to hide the VR UI. -->
+
+    <a-scene
+      embedded
+      arjs="sourceType: webcam ;detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      vr-mode-ui="enabled: false;"
+      renderer="antialias: true; logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true;"
+    >
+      <a-assets>
+        <!-- model Coral free from 3D Veiwer keyword "Coral reef"-->
+        <a-asset-item
+          id="modelCoral"
+          src="assets\coralReef.glb"
+        ></a-asset-item>
+
+        <!-- model Fish animation swiming from https://skfb.ly/oHnXG -->
+        <a-asset-item
+          id="modelFish"
+          src="assets\schoolOfFish.glb"
+        ></a-asset-item>
+      </a-assets>
+
+      <a-marker type="barcode" value="0" id="m0" marker-events>
+        <a-entity
+          id="p0"
+          rotation = "0 0 0"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="1" id="m1" marker-events>
+        <a-entity 
+          id="p1" 
+          rotation = "-90 0 0"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="2" id="m2" marker-events>
+        <a-entity
+          id="p2"
+          rotation = "0 90 -90"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="3" id="m3" marker-events>
+        <a-entity
+          id="p3"
+          rotation = "0 -90 90"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="4" id="m4" marker-events>
+        <a-entity
+          id="p4"
+          rotation = "180 0 0"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="5" id="m5" marker-events>
+        <a-entity
+          position="0 -1 0"
+          id="p5"
+          rotation = "90 0 0"
+        ></a-entity>
+      </a-marker>
+
+      <!-- draw the scene here -->
+      <a-entity draw-scene id="here"></a-entity>
+
+      <!-- we need the camera entity to use the webcam to detect the markers -->
+      <a-entity camera id="target"> </a-entity>
+
+      <a-entity id="test">
+        <!-- load model -->
+        <a-gltf-model
+          src="#modelFish"
+          position="0 0.5 0.5"
+          scale="0.2 0.2 0.2"
+          animation-mixer
+        ></a-gltf-model>
+        <a-gltf-model
+          src="#modelCoral"
+          position="0 -1.1 0"
+          scale="7 7 7"
+        >
+        </a-gltf-model>
+        <!-- billboard 1-->
+        <a-entity look-at-target>
+          <a-plane
+            color="#000000"
+            opacity="0.4"
+            height="0.3"
+            width="1.2"
+            position="0 3 0"
+          ></a-plane>
+          <a-text value="Needle coral" color= "white" opacity=" 2" position="-0.5 3 -0.1" width="4"></a-text>
+          </a-entity>
+            <!-- line  -->
+            <a-entity >
+              <a-cylinder
+                color="black"
+                opacity="1"
+                radius="0.01"
+                height="1.6"
+                segments-height="2"
+                segments-radial="6"
+                position="0 2 0"
+              ></a-cylinder>
+            </a-entity>
+        <!-- billboard 2-->
+        <a-entity look-at-target>
+          <a-plane
+            color="#000000"
+            opacity="0.4"
+            height="0.3"
+            width="1.2"
+            position="-1.5 1.7 2" 
+          ></a-plane>
+          <a-text value="Spiny coral" color= "white" opacity=" 2" position="-2 1.7 1.9" width="4"></a-text>
+          </a-entity>
+            <!-- line  -->
+            <a-entity >
+              <a-cylinder
+                color="black"
+                opacity="1"
+                radius="0.01"
+                height="1.8"
+                segments-height="2"
+                segments-radial="6"
+                position="-1.6 1 0"
+              ></a-cylinder>
+            </a-entity>
+
+      </a-entity>
+
+      <!-- ocean directional light shining from the top left. -->
+      <a-light color="#26c6da" position="-1 1 1" intensity="0.9"></a-light>
+      <!-- teal point light. -->
+      <a-light
+        type="point"
+        color="white"
+        position="1 -1 1"
+        intensity="0.9"
+      ></a-light>
+      <!-- dim ambient lighting. -->
+      <a-light type="ambient" color="#404040"></a-light>
+    </a-scene>
+  </body>
+</html>
+
+
